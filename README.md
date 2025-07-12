@@ -2,6 +2,15 @@
 
 A minimal question-and-answer platform that supports collaborative learning and structured knowledge sharing. Designed to be simple, user-friendly, and focused on the core experience of asking and answering questions within a community.
 
+## Team BARY
+
+| Name | Email |
+|------|-------|
+| Benny | benny01r@gmail.com |
+| Ayush | ayushgupta01195@gmail.com |
+| Rishi | akkina.rishyendra@gmail.com |
+| Yogesh | yogesh.gorrepati30@gmail.com |
+
 ## Features
 
 ### User Roles
