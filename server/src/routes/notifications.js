@@ -2,6 +2,8 @@ const express = require('express');
 const supabase = require('../utils/supabase');
 const { authenticateToken } = require('../middleware/auth');
 
+// CAUTION: test all the routes
+
 const router = express.Router();
 
 // GET /api/notifications
