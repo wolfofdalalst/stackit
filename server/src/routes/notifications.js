@@ -5,7 +5,9 @@ const { authenticateToken } = require('../middleware/auth');
 const router = express.Router();
 
 // GET /api/notifications
-// Get user notifications
+// Query Parameters: ?page=1&limit=20&unread=true
+// Headers: Authorization: Bearer <accessToken>
+// Returns: { notifications: array, pagination: object, unreadCount: number }
 router.get('/', authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id;
@@ -48,7 +50,9 @@ router.get('/', authenticateToken, async (req, res) => {
 });
 
 // PUT /api/notifications/:id/read
-// Mark notification as read
+// URL Parameters: :id (notification id)
+// Headers: Authorization: Bearer <accessToken>
+// Returns: { message: string }
 router.put('/:id/read', authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id;
@@ -66,7 +70,8 @@ router.put('/:id/read', authenticateToken, async (req, res) => {
 });
 
 // PUT /api/notifications/mark-all-read
-// Mark all notifications as read
+// Headers: Authorization: Bearer <accessToken>
+// Returns: { message: string }
 router.put('/mark-all-read', authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id;
@@ -83,7 +88,9 @@ router.put('/mark-all-read', authenticateToken, async (req, res) => {
 });
 
 // DELETE /api/notifications/:id
-// Delete notification
+// URL Parameters: :id (notification id)
+// Headers: Authorization: Bearer <accessToken>
+// Returns: { message: string }
 router.delete('/:id', authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id;
@@ -101,7 +108,8 @@ router.delete('/:id', authenticateToken, async (req, res) => {
 });
 
 // GET /api/notifications/unread-count
-// Get unread notification count
+// Headers: Authorization: Bearer <accessToken>
+// Returns: { count: number }
 router.get('/unread-count', authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id;
