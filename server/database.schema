@@ -1,0 +1,94 @@
+-- WARNING: This schema is for context only and is not meant to be run.
+-- Table order and constraints may not be valid for execution.
+
+CREATE TABLE public.answers (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  content text NOT NULL,
+  question_id uuid NOT NULL,
+  user_id uuid NOT NULL,
+  is_accepted boolean DEFAULT false,
+  vote_score integer DEFAULT 0,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT answers_pkey PRIMARY KEY (id),
+  CONSTRAINT answers_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
+  CONSTRAINT answers_question_id_fkey FOREIGN KEY (question_id) REFERENCES public.questions(id)
+);
+CREATE TABLE public.comments (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  content text NOT NULL,
+  answer_id uuid NOT NULL,
+  user_id uuid NOT NULL,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT comments_pkey PRIMARY KEY (id),
+  CONSTRAINT comments_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
+  CONSTRAINT comments_answer_id_fkey FOREIGN KEY (answer_id) REFERENCES public.answers(id)
+);
+CREATE TABLE public.notifications (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  type character varying NOT NULL CHECK (type::text = ANY (ARRAY['question_answered'::character varying, 'answer_commented'::character varying, 'mention'::character varying, 'answer_accepted'::character varying]::text[])),
+  title character varying NOT NULL,
+  message text NOT NULL,
+  related_id uuid,
+  related_type character varying CHECK (related_type::text = ANY (ARRAY['question'::character varying, 'answer'::character varying, 'comment'::character varying]::text[])),
+  is_read boolean DEFAULT false,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT notifications_pkey PRIMARY KEY (id),
+  CONSTRAINT notifications_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
+);
+CREATE TABLE public.question_tags (
+  question_id uuid NOT NULL,
+  tag_id uuid NOT NULL,
+  CONSTRAINT question_tags_pkey PRIMARY KEY (question_id, tag_id),
+  CONSTRAINT question_tags_tag_id_fkey FOREIGN KEY (tag_id) REFERENCES public.tags(id),
+  CONSTRAINT question_tags_question_id_fkey FOREIGN KEY (question_id) REFERENCES public.questions(id)
+);
+CREATE TABLE public.questions (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  title character varying NOT NULL,
+  description text NOT NULL,
+  user_id uuid NOT NULL,
+  accepted_answer_id uuid,
+  view_count integer DEFAULT 0,
+  vote_score integer DEFAULT 0,
+  is_closed boolean DEFAULT false,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT questions_pkey PRIMARY KEY (id),
+  CONSTRAINT fk_accepted_answer FOREIGN KEY (accepted_answer_id) REFERENCES public.answers(id),
+  CONSTRAINT questions_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
+);
+CREATE TABLE public.tags (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  name character varying NOT NULL UNIQUE,
+  description text,
+  color character varying DEFAULT '#3B82F6'::character varying,
+  usage_count integer DEFAULT 0,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT tags_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.users (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  username character varying NOT NULL UNIQUE,
+  email character varying NOT NULL UNIQUE,
+  password_hash character varying NOT NULL,
+  role character varying DEFAULT 'user'::character varying CHECK (role::text = ANY (ARRAY['guest'::character varying, 'user'::character varying, 'admin'::character varying]::text[])),
+  avatar_url character varying,
+  bio text,
+  reputation integer DEFAULT 0,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT users_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.votes (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  votable_type character varying NOT NULL CHECK (votable_type::text = ANY (ARRAY['question'::character varying, 'answer'::character varying]::text[])),
+  votable_id uuid NOT NULL,
+  vote_type character varying NOT NULL CHECK (vote_type::text = ANY (ARRAY['upvote'::character varying, 'downvote'::character varying]::text[])),
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT votes_pkey PRIMARY KEY (id),
+  CONSTRAINT votes_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
+);

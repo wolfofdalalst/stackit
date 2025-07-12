@@ -6,6 +6,7 @@ const answerRoutes = require('./answers');
 const tagRoutes = require('./tags');
 const voteRoutes = require('./votes');
 const notificationRoutes = require('./notifications');
+const commentRoutes = require('./comments');
 
 const router = express.Router();
 
@@ -16,5 +17,6 @@ router.use("/answers", answerRoutes);
 router.use('/tags', tagRoutes);
 router.use('/vote', voteRoutes);
 router.use('/notifications', notificationRoutes);
+router.use('/comments', commentRoutes);
 
 module.exports = router;
