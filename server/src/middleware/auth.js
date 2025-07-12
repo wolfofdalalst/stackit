@@ -25,7 +25,7 @@ const authenticateToken = (req, res, next) => {
     try {
       const { data: user, error } = await supabase
         .from('users')
-        .select('id, username, email, avatar_url, bio, reputation, created_at, updated_at')
+        .select('id, username, email, role, avatar_url, bio, reputation, created_at, updated_at')
         .eq('id', decoded.id)
         .single();
 
@@ -44,4 +44,14 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-module.exports = { authenticateToken };
+// Middleware to authorize user roles
+const authorizeRole = (...allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.user || !allowedRoles.includes(req.user.role)) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+    next();
+  };
+};
+
+module.exports = { authenticateToken, authorizeRole };
